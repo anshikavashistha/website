@@ -23,6 +23,19 @@ characteristics:
  * Permissions are applied on a specified set of tables, which can be
    enumerated or specified by regex.
 
+## Why Table-Level ACLs are Implemented in VTTablet and Not VTGate
+
+Vitess implements table-level ACLs at the `vttablet` level rather than in `vtgate` for several important reasons:
+
+1. **Granular Control**: 
+   `vttablet` interacts directly with the underlying MySQL database, providing a more granular level of access control. This allows Vitess to enforce permissions on specific tables, ensuring that only authorized users can perform operations on sensitive data.
+
+2. **Separation of Responsibilities**: 
+   `vtgate` is primarily focused on query routing, load balancing, and managing sharded queries across multiple tablets. By keeping table-level ACLs within `vttablet`, Vitess maintains a clear separation of duties, ensuring that each component is optimized for its specific function.
+
+3. **Performance Considerations**: 
+   By handling ACLs at the `vttablet` level, Vitess reduces the overhead on `vtgate`. `vttablet` can make more efficient decisions regarding access control since it is closer to the data and fully aware of the table structure. This approach ensures that `vtgate` remains performant and focused on query routing without being bogged down by additional access control logic.
+
 ## VTTablet parameters for table ACLs
 
 Note that the Vitess authorization via ACLs are applied at the VTTablet
